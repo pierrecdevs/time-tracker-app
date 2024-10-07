@@ -11,3 +11,4 @@ I broke the project into several branches for the "steps" with the intention to 
 - [main](https://github.com/pierrecdevs/time-tracker-app/tree/main)
 - [signup](https://github.com/pierrecdevs/time-tracker-app/tree/signup)
 - [login](https://github.com/pierrecdevs/time-tracker-app/tree/login)
+- [myaccount](https://github.com/pierrecdevs/time-tracker-app/tree/myaccount)
