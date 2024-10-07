@@ -1,4 +1,9 @@
-from django.shortcuts import render
+from django.contrib.auth import login
+from django.shortcuts import redirect, render
+
+from apps.core.forms import CustomUserCreationForm
+from apps.userprofile.models import UserProfile
+
 
 # Create your views here.
 def frontpage(request):
@@ -12,3 +17,24 @@ def terms(request):
 
 def plans(request):
     return render(request,'core/plans.html')
+
+def signup(request):
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            user.username = user.username
+            user.email = form.cleaned_data['username']
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+
+            userprofile = UserProfile.objects.create(user=user)
+            login(request, user)
+
+            return redirect('frontpage')
+        else:
+            print(form.errors) # this was debugging. apparently django requires you to use password1 and password2
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'core/signup.html', {'form': form})
