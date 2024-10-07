@@ -6,7 +6,7 @@ This is a time tracking app written in Python using the Django framework and Vue
 
 I broke the project into several branches for the "steps" with the intention to make a "merged" branch that has all branches
 
-## Branch List
+# Branches
 
 - [main](https://github.com/pierrecdevs/time-tracker-app/tree/main)
 - [signup](https://github.com/pierrecdevs/time-tracker-app/tree/signup)
