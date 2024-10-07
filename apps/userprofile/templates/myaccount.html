@@ -21,7 +21,7 @@
       <p class="subtitle is-6">{{ user.email }}</p>
     </div>
 
-    <div class="is-flex">
+    <div class="is-flex mt-3">
       <a href="{% url 'edit_profile' %}" class="button is-info mr-2">Edit profile</a>
 
       <form method="post" action={% url 'logout' %}>
