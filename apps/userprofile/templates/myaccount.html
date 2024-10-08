@@ -3,32 +3,71 @@
 {% block title %}My account | {% endblock %}
 
 {% block content %}
-<nav class="breadcrumb" aira-label="breadcrumbs">
-  <ul>
-    <li><a href="#">Dashboard</a></li>
-    <li class="active"><a href="{% url 'myaccount' %}" aria-current="page">My account</a></li>
-  </ul>
-</nav>
+  <nav class="breadcrumb" aira-label="breadcrumbs">
+    <ul>
+      <li><a href="#">Dashboard</a></li>
+      <li class="active"><a href="{% url 'myaccount' %}" aria-current="page">My account</a></li>
+    </ul>
+  </nav>
 
-<div class="columns">
-  <div class="column is-6">
-    <div class="media mb-4">
-      <div class="media-left"></div>
-    </div>
+  <div class="columns">
+    <div class="column is-6">
+      <div class="media mb-4">
+        <div class="media-left"></div>
+      </div>
 
-    <div class="media-content">
-      <p class="title is-3">{% firstof user.get_full_name user.username %}</p>
-      <p class="subtitle is-6">{{ user.email }}</p>
-    </div>
+      <div class="media-content">
+        <p class="title is-3">{% firstof user.get_full_name user.username %}</p>
+        <p class="subtitle is-6">{{ user.email }}</p>
+      </div>
 
-    <div class="is-flex mt-3">
-      <a href="{% url 'edit_profile' %}" class="button is-info mr-2">Edit profile</a>
+      <div class="is-flex mt-3">
+        <a href="{% url 'edit_profile' %}" class="button is-info mr-2">Edit profile</a>
 
-      <form method="post" action={% url 'logout' %}>
-        {% csrf_token %}
-        <button class="button is-danger is-1">Log out</button>
-      </form>
+        <form method="post" action={% url 'logout' %}>
+          {% csrf_token %}
+          <button class="button is-danger is-1">Log out</button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
+  <hr>
+  <div class="columns">
+    <div class="column is-12">
+      <h2 class="subtitle">Teams</h2>
+
+      <a href="{% url 'team:add' %}" class="button is-success">Add team</a>
+    </div>
+  </div>
+
+  <div class="columns">
+    {% if active_team %}
+    <div class="column is-4">
+      <div class="notification has-background-success">
+        <h3 class="is-size-5">{{ active_team.title }} {% if active_team.created_by == request.user %} (Owner) {% endif %}</h3>
+        <h3 class="is-sie-6">.... plan will be listed here ...</h3>
+
+        <hr>
+
+      <a href="{% url 'team:team' active_team.id %}" class="button is-success">Details</a>
+        {% if active_team.created_by == request.user %}
+          <a href="#" class="button is-info">Invite users</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    {% for team in teams %}
+    <div class="column is-4">
+      <div class="notification">
+        <h3 class="is-size-5">{{ team.title }} {% if team.created_by == request.user %} (Owner) {% endif %}</h3>
+        <h3 class="is-sie-6">.... plan will be listed here ...</h3>
+
+        <hr>
+
+        <a href="{% url 'team:team' team.id %}" class="button is-success">Details</a>
+        <a href="{% url 'team:activate_team' team.id %}" class="button is-info">Activate</a>
+      </div>
+    </div>
+      {% endfor %}
+  </div>
 {% endblock %}
