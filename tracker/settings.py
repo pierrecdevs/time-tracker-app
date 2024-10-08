@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.userprofile',
     'apps.team',
+    'apps.project',
 ]
 
 MIDDLEWARE = [
