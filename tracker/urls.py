@@ -24,11 +24,11 @@ urlpatterns = [
     path('privacy/',  privacy, name='privacy'),
     path('terms/',  terms, name='terms'),
     path('plans/',  plans, name='plans'),
-
     path('admin/', admin.site.urls),
 
     path('signup/', signup, name='signup'),
     path('login/', auth_views.LoginView.as_view(template_name= 'core/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('myaccount/', include('apps.userprofile.urls')),
+    path('myaccount/teams/', include('apps.team.urls')),
 ]
