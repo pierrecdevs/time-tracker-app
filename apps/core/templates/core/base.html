@@ -10,7 +10,7 @@
 
 <body>
   <div id="navbar-app">
-    <nav class="navbar">
+      <nav class="navbar {% if request.user.is_authenticated %} is-dark{% else %} is-light {% endif %}">
       <div class="navbar-brand">
         <a href="/" class="navbar-item"><strong>FKS</strong> Time Tracker</a>
       </div>
