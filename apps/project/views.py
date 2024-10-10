@@ -33,7 +33,7 @@ def project(request, project_id):
         title = request.POST.get('title')
 
         if title:
-            task = Task.objects.create(team=team, project=project, created_by=request.user,  title=title)
+            task = Task.objects.create(team=team, project=project, created_by=request.user, title=title)
 
             messages.info(request, 'Task has been added.')
             return redirect('project:project', project_id=project.id)
@@ -75,7 +75,7 @@ def task(request,project_id, task_id):
         date = f'{request.POST.get('date')} {datetime.now().time()}'
         minutes_total = (hours * 60) + minutes
 
-        entry = Entry.objects.create(team=team, project=project, task=task, minutes=minutes_total, created_by=request.user, created_at=date)
+        entry = Entry.objects.create(team=team, project=project, task=task, minutes=minutes_total, created_by=request.user, created_at=date, is_tracked=True)
 
     return render(request, 'project/task.html', {'today': datetime.today,'team': team, 'project': project, 'task': task})
 
