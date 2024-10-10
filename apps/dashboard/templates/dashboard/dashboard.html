@@ -1,4 +1,6 @@
-{%extends 'core/base.html' %}
+{% extends 'core/base.html' %}
+
+{% load dashboardextras %}
 
 {% block title %}Dashboard | {% endblock %}
 
@@ -21,14 +23,14 @@
           <tr>
             <td>{{ entry.task.title }}</td>
             <td>{{ entry.project.title }}</td>
-            <td>{{ entry.minutes }}</td>
+            <td>{{ entry.minutes|format_minutes }}</td>
           </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <tr>
             <td colspan="2">Total</td>
-            <td>{{ time_for_user_and_date }}</td>
+            <td>{{ time_for_user_and_date|format_minutes }}</td>
           </tr>
         </tfoot>
       </table>
@@ -59,7 +61,7 @@
             {% if project.time_for_user_and_project_and_month > 0 %}
             <tr>
               <td>{{ project.title }}</td>
-              <td>{{ project.time_for_user_and_project_and_month }}</td>
+              <td>{{ project.time_for_user_and_project_and_month|format_minutes }}</td>
             </tr>
             {% endif %}
           {% endfor %}
@@ -67,7 +69,7 @@
         <tfoot>
           <tr>
             <td>Total</td>
-            <td>{{ time_for_user_and_month }}</td>
+            <td>{{ time_for_user_and_month|format_minutes }}</td>
           </tr>
         </tfoot>
       </table>
@@ -81,11 +83,61 @@
       </div>
     </div>
 
+    {% if request.user == team.created_by %}
+    <div class="column is-6">
+      <div class="notification">
+        <h2 class="subtitle">Your team {% if team_num_months is 0 %}this month {% else %}{{ team_month|date:'Y-m'}}{% endif %}</h2>
+
+      {% if time_for_team_and_month > 0 %}
+        <table class="table is-fullwidth" style="text-align: left">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for member in members %}
+            <tr>
+              <td>{% firstof member.get_full_name member.username %}</td>
+              <td>{{ member.time_for_user_and_team_and_month|format_minutes }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+      <p>No registered time for your team this month.</p>
+      {% endif %}
+
+      <a href="?team_num_months={{ team_num_months|add:'1' }}" class="mt-5">Previous</a>
+      {% if team_num_months > 0 %}
+      <a href="?team_num_months={{ team_num_months|add:'-1' }}" class="mt-5">Next</a>
+      {% endif %}
+      </div>
+    </div>
+    {% endif %}
 </div>
 
-<div class="column is-multiline">
+<div class="columns is-multiline">
   <div class="column is-12">
     <h2 class="subtitle">Newest projects</h2>
   </div>
+  {% for project in projects %}
+  <div class="column is-3">
+    <div class="notification">
+      <h2 class="is-size-5">{{ project.title }}</h2>
+      <p class="is-size-7">Registered time: {{ project.registered_time|format_minutes }}</p>
+      <p class="is-size-7">Tasks: {{ project.num_tasks_todo }}</p>
+      <hr>
+      <a href="{% url 'project:project' project.id %}" class="button is-info">Details</a>
+    </div>
+  </div>
+  {% empty %}
+    <div class="column is-3">
+      <div class="notification">
+        <p>No projects.</p>
+      </div>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}
