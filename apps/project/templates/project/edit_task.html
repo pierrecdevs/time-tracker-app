@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Edit project | {{project.title }} {% endblock %}
+{% block title %}Edit task | {{task.title }} {% endblock %}
 
 {% block content %}
 <div id="project-app">
@@ -16,14 +16,14 @@
         <a href="{% url 'project:project' project.id %}" aria-current="page">{{project.title}}</a>
       </li>
       <li class="is-active">
-        <a href="{% url 'project:edit_project' project.id %}" aria-current="page">Edit project</a>
+        <a href="{% url 'project:edit_task' project.id task.id %}" aria-current="page">Edit task</a>
       </li>
     </ul>
   </nav>
 
   <div class="columns">
     <div class="column">
-      <h1 class="title">Edit project</h1>
+      <h1 class="title">Edit task</h1>
 
       <div class="columns">
          <div class="column is-4">
@@ -32,7 +32,19 @@
             <div class="field">
               <label for="id_title">Title</label>
               <div class="control">
-                <input type="text" name="title" id="id_title" class="input" value="{{ project.title }}">
+                <input type="text" name="title" id="id_title" class="input" value="{{ task.title }}">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="id_status">Status</label>
+              <div class="control">
+                <div class="select">
+                  <select name="status" id="id_status">
+                    <option value="todo"{% if task.status == 'todo' %} selected {% endif %}>Todo</option>
+                    <option value="done"{% if task.status == 'done' %} selected {% endif %}>Done</option>
+                  </select>
+                </div>
               </div>
             </div>
 
