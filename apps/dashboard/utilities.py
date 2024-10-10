@@ -34,7 +34,7 @@ def get_time_for_user_and_project_and_month(team, project, user, month):
 
 def get_time_for_user_and_team_month(team, user, month):
     entries = Entry.objects.filter(team=team,
-                                   create_by=user,
+                                   created_by=user,
                                    created_at__year=month.year,
                                    created_at__month=month.month,
                                    is_tracked=True)
