@@ -18,7 +18,57 @@ class Project(models.Model):
         return f"{self.title}"
 
     def registered_time(self) -> int:
-        return 0
+        return sum(entry.minutes for entry in self.entries.all())
 
     def num_tasks_todo(self) -> int:
-        return 0 # self.tasks.filter(status=Task.TODO).count()
+        return self.tasks.filter(status=Task.TODO).count()
+
+class Task(models.Model):
+    TODO = 'todo'
+    DONE = 'done'
+    ARCHIVED = 'archived'
+
+    CHOICES_STATUS = (
+        (TODO,'Todo'),
+        (DONE, 'Done'),
+        (ARCHIVED, 'Archived'),
+    )
+
+    team = models.ForeignKey(Team, related_name='tasks', on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name='tasks', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    created_by = models.ForeignKey(User, related_name='tasks', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    status = models.CharField(max_length=20, choices=CHOICES_STATUS, default=TODO)
+
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return f'{self.title}'
+
+    def registered_time(self) -> int:
+        return sum(entry.minutes for entry in self.entries.all())
+
+
+class Entry(models.Model):
+    team = models.ForeignKey(Team, related_name='entries', on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name='entries', on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, related_name='entries', on_delete=models.CASCADE)
+    minutes = models.IntegerField(default=0)
+
+    is_tracked = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, related_name='entries', on_delete=models.CASCADE)
+    created_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        if self.task:
+            return f'{self.task.title} - {self.created_at}' 
+
+        return f'{self.created_at}'
+    
