@@ -22,11 +22,17 @@
       </div>
 
       <div class="is-flex mt-3">
-        <a href="{% url 'edit_profile' %}" class="button is-info mr-2">Edit profile</a>
+        <a href="{% url 'edit_profile' %}" class="button is-info mr-2">
+        <span class="icon"><i class="fa fa-user-pen"></i></span>
+        <span>Edit profile</span>
+        </a>
 
         <form method="post" action={% url 'logout' %}>
           {% csrf_token %}
-          <button class="button is-danger is-1">Log out</button>
+          <button class="button is-danger is-1">
+          <span class="icon">
+            <i class="fa fa-right-from-bracket"></i>
+          </span><span>Log out</span></button>
         </form>
       </div>
     </div>
@@ -36,7 +42,9 @@
     <div class="column is-12">
       <h2 class="subtitle">Teams</h2>
 
-      <a href="{% url 'team:add' %}" class="button is-success">Add team</a>
+    <a href="{% url 'team:add' %}" class="button is-success">
+      <span class="icon"><i class="fa fa-people-group"></i></span>
+      <span>Add team</span></a>
     </div>
   </div>
 
@@ -49,9 +57,15 @@
 
         <hr>
 
-      <a href="{% url 'team:team' active_team.id %}" class="button is-success">Details</a>
+      <a href="{% url 'team:team' active_team.id %}" class="button is-secondary is-outlined">
+          <span class="icon"><i class="fa-solid fa-circle-info"></i></span>
+          <span>Details</span>
+      </a>
         {% if active_team.created_by == request.user %}
-          <a href="#" class="button is-info">Invite users</a>
+          <a href="#" class="button is-info">
+            <span class="icon"><i class="fa-solid fa-person-circle-plus"></i></span>
+            <span>Invite users</span>
+          </a>
         {% endif %}
       </div>
     </div>
@@ -64,8 +78,14 @@
 
         <hr>
 
-        <a href="{% url 'team:team' team.id %}" class="button is-success">Details</a>
-        <a href="{% url 'team:activate_team' team.id %}" class="button is-info">Activate</a>
+        <a href="{% url 'team:team' team.id %}" class="button is-success">
+          <span class="icon"><i class="fa-solid fa-circle-info"></i></span>
+          <span>Details</span>
+        </a>
+        <a href="{% url 'team:activate_team' team.id %}" class="button is-info">
+          <span class="icon"><i class="fa-solid fa-toggle-on"></i></span>
+          <span>Activate</span>
+        </a>
       </div>
     </div>
       {% endfor %}
