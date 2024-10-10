@@ -8,3 +8,7 @@ This is a time tracking app written in Python using the Django framework and Vue
 - [main](https://github.com/pierrecdevs/time-tracker-app/tree/main)
 - [signup](https://github.com/pierrecdevs/time-tracker-app/tree/signup)
 - [login](https://github.com/pierrecdevs/time-tracker-app/tree/login)
+- [myaccount](https://github.com/pierrecdevs/time-tracker-app/tree/myaccount)
+- [projects](https://github.com/pierrecdevs/time-tracker-app/tree/projects)
+- [dashboard](https://github.com/pierrecdevs/time-tracker-app/tree/dashboard)
+- [dev -- full app](https://github.com/pierrecdevs/time-tracker-app/tree/dev)
