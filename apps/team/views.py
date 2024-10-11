@@ -1,9 +1,13 @@
+import string, secrets
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
+from apps.team.utilities import send_invitation, send_invitation_accepted
+
 # Create your views here.
-from .models import Team
+from .models import Invitation, Team
 
 @login_required
 def team(request, team_id):
@@ -13,8 +17,9 @@ def team(request, team_id):
         status=Team.ACTIVE,
         members__in=[request.user]
     )
+    invitations = team.invitations.filter(status=Invitation.INVITED)
 
-    return render(request, 'team.html', {'team': team})
+    return render(request, 'team.html', {'team': team, 'invitations': invitations})
 
 @login_required
 def activate_team(request, team_id):
@@ -70,3 +75,28 @@ def edit(request):
             return redirect('team:team', team_id=team.id)
 
     return render(request, 'edit.html', {'team': team})
+
+@login_required
+def invite(request):
+    team = get_object_or_404(Team, pk=request.user.userprofile.active_team_id, status=Team.ACTIVE)
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+
+        if email:
+            invitations = Invitation.objects.filter(team=team, email=email)
+
+            if not invitations:
+                letters = string.ascii_lowercase + string.ascii_uppercase + string.digits
+                code = ''.join(secrets.choice(letters) for i in range(13))
+                invitation = Invitation.objects.create(team=team, email=email, code=code)
+
+                messages.info(request, 'The user was invited')
+                send_invitation(email, code, team)
+
+                return redirect('team:team', team_id=team.id)
+            else:
+                messages.info(request, 'The user has already been invited')
+
+    return render(request, 'invite.html', { 'team':team })
+

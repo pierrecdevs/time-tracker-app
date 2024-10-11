@@ -2,6 +2,7 @@ from django.contrib.auth import login
 from django.shortcuts import redirect, render
 
 from apps.core.forms import CustomUserCreationForm
+from apps.team.models import Invitation
 from apps.userprofile.models import UserProfile
 
 
@@ -31,7 +32,12 @@ def signup(request):
             userprofile = UserProfile.objects.create(user=user)
             login(request, user)
 
-            return redirect('frontpage')
+            invitations = Invitation.objects.filter(email=user.email, status=Invitation.INVITED)
+
+            if invitations:
+                return redirect('accept_invitation')
+            else:
+                return redirect('dashboard')
         else:
             print(form.errors) # this was debugging. apparently django requires you to use password1 and password2
     else:

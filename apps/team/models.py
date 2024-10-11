@@ -22,3 +22,22 @@ class Team(models.Model):
 
     def __str__(self):
         return f"{self.title}"
+
+class Invitation(models.Model):
+    INVITED = 'invited'
+    ACCEPTED = 'accepted'
+
+    CHOICES_STATUS = (
+        (INVITED, 'Invited'),
+        (ACCEPTED, 'Accepted'),
+    )
+
+    team = models.ForeignKey(Team, related_name='invitations', on_delete=models.CASCADE)
+    email = models.EmailField()
+    code = models.CharField(max_length=20)
+    status = models.CharField(max_length=20, choices=CHOICES_STATUS, default=INVITED)
+    date_sent = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f'{self.email}'
