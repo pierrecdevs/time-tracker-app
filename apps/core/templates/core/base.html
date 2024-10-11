@@ -27,6 +27,24 @@
             <a href="{% url 'project:projects' %}" class="navbar-item">
               <span class="icon"><i class="fa-solid fa-list-check"></i></span>
               <span>Projects</span></a> 
+
+            <div class="navbar-item" v-if="!trackingTime">
+              <div class="buttons">
+                <a class="button is-success" @click="startTimer()">
+                  <span class="icon"><i class="fa-solid fa-stopwatch"></i></span>
+                  <span>Start</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="navbar-item" v-else>
+              <div class="buttons">
+                <a class="button is-warning" @click="stopTimer()">
+                  <span class="icon"><i class="fa-solid fa-stopwatch"></i></span>
+                  <span>[[ readableSeconds]] (stop)</span>
+                </a>
+              </div>
+            </div>
             {% endif %}
 
           <div class="navbar-item">
@@ -35,8 +53,9 @@
                 <a href="{% url 'myaccount' %}" class="button is-success">
                   <span class="icon"><i class="fa fa-user"></i></span>
                   <span>
-                  {% firstof request.user.get_full_name request.user.username %} {% if active_team %} ({{active_team.title}}) {% endif %}</a>
-                </span>
+                    {% firstof request.user.get_full_name request.user.username %}{% if active_team %} ({{ active_team.title }}) {% endif %}
+                  </span>
+                </a>
                 {% else %}
                   <a href="{% url 'signup' %}" class="button is-success"><strong>Sign up</strong></a>
                   <a href="{% url 'login' %}" class="button">Log in</a>
@@ -45,8 +64,29 @@
           </div>
         </div>
       </div>
-
     </nav>
+
+
+      <div class="modal" :class="{'is-active': showTrackingModal}">
+        <div class="modal-backdround"></div>
+        <div class="modal-card">
+          <div class="modal-card-head">
+            <p class="modal-card-title">Tracked time</p>
+          </div>
+
+          <div class="modal-card-body">
+            <p>You have tracked [[ readableSeconds ]]</p>
+          </div>
+
+          <footer class="modal-card-foot">
+            <div class="buttons">
+              <button class="button is-primary" @click="addToTask()">Add to task</button>
+              <button class="button is-success" @click="addLater()">Add later</button>
+              <button class="button is-danger" @click="discardTimer()">Discard</button>
+            </div>
+          </footer>
+        </div>
+      </div>
   </div>
 
   <section class="section">
@@ -80,6 +120,98 @@
   </footer>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js" integrity="sha512-6sSYJqDreZRZGkJ3b+YfdhB3MzmuP9R7X1QZ6g5aIXhRvR1Y/N/P47jmnkENm7YL3oqsmI6AK+V6AD99uWDnIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      const NavbarApp = {
+        data() {
+          return {
+            seconds: {{ active_entry_seconds }},
+            trackingTime: false,
+            showTrackingModal: false,
+            entryID: 0,
+            startTime: '{{ start_time }}'
+          }
+        },
+        delimiters: ['[[',']]'],
+        methods: {
+          async startTimer() {
+            response =await fetch('{% url 'project:api_start_timer' %}', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              },
+            });
+
+            this.startTime = new Date();
+            this.trackingTime = true;
+            this.timer = setInterval(() => {
+              this.seconds = (new Date() - this.startTime) / 1000;
+            }, 1000);
+          },
+          async stopTimer() {
+            const response = await fetch('{% url 'project:api_stop_timer' %}', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              },
+            });
+
+            if (response.ok) {
+              const entryId = await response.json();
+              this.entryID = entryId.entryID;
+              this.showTrackingModal = true;
+              this.trackingTime = false;
+
+              window.clearTimeout(this.timer);
+            }
+          },
+          async discardTimer() {
+            const response = await fetch('{% url 'project:api_discard_timer' %}', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+              },
+            });
+
+            if (response.ok) {
+              this.seconds = 0;
+              this.showTrackingModal = false;
+              this.trackingTime = false;
+            }
+          },
+          addLater() {
+            this.seconds = 0;
+            this.showTrackingModal = false;
+          },
+
+        },
+        mounted() {
+          if (this.seconds !== 0) {
+            this.trackingTime = true;
+            this.timer = setInterval(() => {
+              this.seconds = (new Date() - new Date(this.startTime)) / 1000;
+            }, 1000);
+          }
+        },
+        computed: {
+          readableSeconds() {
+            const d = Number(this.seconds);
+            const h = Math.floor(d / 3600);
+            const m = Math.floor(d % 3600 / 60);
+            const s = Math.floor(d % 3600 % 60);
+
+            const hDisplay = h > 0 ? `${h}h, ` : '';
+            const mDisplay = m > 0 ? `${m}m, ` : '';
+            const sDisplay = s > 0 ? `${s}s` : '';
+
+            return hDisplay + mDisplay + sDisplay
+          },
+        },
+      };
+      Vue.createApp(NavbarApp).mount('#navbar-app');
+    </script>
     {% block scripts %}
     {% endblock %}
 </body>

@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Team | {% endblock %}
+  {% block title %}{{ team.title }} | {% endblock %}
 
 {% block content %}
 
@@ -16,12 +16,21 @@
   <div class="column is-4">
     <h1 class="title">{{team.title}}</h1>
 
+      {% if request.user == team.created_by %}
+      <a href="{% url 'team:invite' %}" class="button is-primary">Invite users</a>
+      {% endif %}
+
     <hr>
 
     <h2 class="subtitle mt-6">Members</h2>
     {% for member in team.members.all %}
     <p>{{ member.username }}</p>
     {% endfor %}
+
+      <h2 class="subtitle mt-6">Members Invited</h2>
+      {% for member in invitations %}
+      <p>{{ member.email }} - {{ member.date_sent|timesince }} ago</p>
+      {% endfor %}
   </div>
 
   <hr>
