@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +31,15 @@ ALLOWED_HOSTS = ['10.13.3.121']
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'myaccount'
 LOGOUT_REDIRECT_URL = 'frontpage'
+
+EMAIL_HOST = 'CHANGE THIS'
+EMAIL_HOST_USER = 'CHANGE THIS'
+EMAIL_HOST_PASSWORD = 'CHANGE THIS'
+EMAIL_PORT= 587
+EMAIL_USE_TLS = True
+DEFAULT_EMAIL_FROM = 'FKS Time Tracker <no-reply@fallen.lol>'
+
+ACCEPT_URL = 'https://10.13.3.121:8080/signup'
 
 # Application definition
 
@@ -72,6 +82,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.team.context_processors.active_team',
+                'apps.project.context_processors.active_entry',
             ],
         },
     },
@@ -127,3 +138,6 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
