@@ -48,7 +48,7 @@ def dashboard(request):
 
     for untracked_entry in untracked_entries:
         untracked_entry.minutes_since = int((datetime.now(timezone.utc) - untracked_entry.created_at).total_seconds() / 60 )
-    
+
     context = {
         'team': team,
         'all_projects': all_projects,

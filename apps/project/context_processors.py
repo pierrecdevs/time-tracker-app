@@ -14,5 +14,5 @@ def active_entry(request):
                 active_entry = untracked_entries.first()
                 active_entry.seconds_since = int((datetime.now(timezone.utc) - active_entry.created_at).total_seconds())
 
-                return {'active_entry_seconds': active_entry.seconds_since,'start_time': active_entry.isoformat()}
+                return {'active_entry_seconds': active_entry.seconds_since,'start_time': active_entry.created_at.isoformat()}
     return {'active_entry_seconds': 0, 'start_time': datetime.now().isoformat()}

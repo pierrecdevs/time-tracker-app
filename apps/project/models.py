@@ -15,7 +15,7 @@ class Project(models.Model):
         ordering = ['title']
 
     def __str__(self) -> str:
-        return f"{self.title}"
+        return f'{self.title}'
 
     def registered_time(self) -> int:
         return sum(entry.minutes for entry in self.entries.all())
