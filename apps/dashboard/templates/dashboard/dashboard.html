@@ -98,7 +98,7 @@
           </tr>
         </thead>
         <tbody>
-          
+
         {% for entry in untracked_entries %}
           <tr>
             <td>{{ entry.created_at }}</td>
@@ -117,7 +117,7 @@
               {% endif %}
             </td>
             <td>
-            <a href="" class="button is-success">Add to task</a>
+              <a href="{% url 'project:track_entry' entry.id %}" class="button is-success">Add to task</a>
             </td>
             <td>
               <a href="{% url 'project:delete_untracked_entry' entry.id %}" class="button is-warning">Delete</a>

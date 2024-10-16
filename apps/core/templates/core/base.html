@@ -127,8 +127,10 @@
             seconds: {{ active_entry_seconds }},
             trackingTime: false,
             showTrackingModal: false,
+            timer: null,
             entryID: 0,
-            startTime: '{{ start_time }}'
+            startTime: '{{ start_time }}',
+            csrfToken: '{{ csrf_token }}',
           }
         },
         delimiters: ['[[',']]'],
@@ -138,7 +140,7 @@
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': this.csrfToken,
               },
             });
 
@@ -153,7 +155,7 @@
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': this.csrfToken,
               },
             });
 
@@ -162,7 +164,6 @@
               this.entryID = entryId.entryID;
               this.showTrackingModal = true;
               this.trackingTime = false;
-
               window.clearTimeout(this.timer);
             }
           },
@@ -171,7 +172,7 @@
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
+                'X-CSRFToken': this.csrfToken,
               },
             });
 
@@ -183,7 +184,13 @@
           },
           addLater() {
             this.seconds = 0;
+            this.trackingTime = false;
             this.showTrackingModal = false;
+          },
+
+          addToTask() {
+            const url = `{% url 'project:track_entry' 0 %}`.replace('0', this.entryID);
+            window.location.href =  url;
           },
 
         },
@@ -204,7 +211,7 @@
 
             const hDisplay = h > 0 ? `${h}h, ` : '';
             const mDisplay = m > 0 ? `${m}m, ` : '';
-            const sDisplay = s > 0 ? `${s}s` : '';
+            const sDisplay = s > 0 ? `${s}s ` : '';
 
             return hDisplay + mDisplay + sDisplay
           },

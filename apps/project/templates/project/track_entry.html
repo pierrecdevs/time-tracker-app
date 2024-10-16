@@ -1,0 +1,142 @@
+{% extends 'core/base.html' %}
+
+{% load dashboardextras %}
+
+{% block title %}Track entry | {% endblock %}
+
+{% block content %}
+<div id="projects-app">
+  <nav class="breadcrumb" aira-label="breadcrumbs">
+    <ul>
+      <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+      <li><a href="{% url 'project:projects' %}">Project</a></li>
+      <li class="is-active">
+        <a href="{% url 'project:track_entry' entry.id %}" aria-current="page">Track entry</a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="columns" id="track-entry-app">
+    <div class="column">
+      <h1 class="title">Track entry</h1>
+      <form method="post" action=".">
+        {% csrf_token %}
+        <div class="field">
+          <label for="id_project">Project</label>
+
+          <div class="control">
+            <div class="select">
+              <select name="project" v-model="project" v-on:change="getTasks()" id="id_project">
+                <option value="">Choose project</option>
+                {% for project in projects %}
+                <option value="{{ project.id }}">{{ project.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="field">
+          <label for="id_task">Task</label>
+
+          <div class="control">
+            <div class="select">
+              <select name="task" v-model="task" id="id_task">
+                <option v-for="task in tasks" v-bind:key="task.id" :value="task.id">[[ task.title ]]</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-grouped">
+          <label>Hours and Minutes</label>
+
+          <div class="control">
+            <div class="select">
+              <select name="hours">
+                <option value="0" {% if hours == 0 %} selected{% endif %}>0h</option>
+                {% for i in "x"|rjust:"24" %}
+                <option value="{{ forloop.counter }}" {% if hours == forloop.counter %} selected{% endif %}>{{forloop.counter}}h</option>
+                  {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="select">
+              <select name="minutes">
+                <option value="0" {% if minutes == 0 %} selected{% endif %}>0m</option>
+                {% for i in "x"|rjust:"59" %}
+                    <option value="{{ forloop.counter }}" {% if minutes == forloop.counter %} selected {% endif %}>{{ forloop.counter }}m</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="field">
+          <label for="id_date">Date</label>
+          <div class="control">
+            <input type="date" id="id_date" class="input" name="date" value="{{ entry.created_at|date:'Y-m-d' }}" placeholder="yyyy-mm-dd">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="control">
+            <button class="button is-success">Submit</button> 
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+{% endblock %}
+{% block scripts %}
+  <script>
+    const TrackEntryApp = {
+      data() {
+        return {
+          tasks: [
+            {'id': '', 'title': 'Select project first.'},
+          ],
+          project: '',
+          task: '',
+        }
+      },
+      delimiters: ['[[',']]'],
+      methods: {
+        async getTasks() {
+          try {
+            if (this.project !== '') {
+              const url = `{% url 'project:api_get_tasks' %}`;
+
+                const response = await fetch(`${url}?project_id=${this.project}`, {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              if (response.ok) {
+                const results = await response.json();
+                const {success, tasks} = results;
+                this.tasks = tasks;
+                this.tasks.unshift({'id': '', 'title': 'Select a task'});
+              }
+            } else {
+              this.tasks = [{'id': '', 'title': 'Select project first'}];
+              this.task = '';
+            }
+        } catch(ex) {
+          console.warn(ex.message);
+        }
+      }
+    }
+  };
+
+    Vue.createApp(TrackEntryApp).mount('#track-entry-app');
+  </script>
+{% endblock %}
