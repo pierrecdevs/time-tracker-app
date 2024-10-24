@@ -21,6 +21,7 @@
       <p v-for="error in errors">[[ error ]]</p>
     </div>
 
+    {% if team.plan.max_members_per_team > team.members.count %}
     <form method="post" action="." @submit="validateForm" novalidate>
       {% csrf_token %}
       <div class="field">
@@ -35,6 +36,10 @@
         </div>
       </div>
     </form>
+    {% else %}
+    Contact your team owner for more members.
+    {% endif %}
+
   </div>
 </div>
 {% endblock %}
