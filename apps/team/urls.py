@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import activate_team, add, invite, team, edit
+from .views import activate_team, add, invite, plans, team, edit
 
 app_name = 'team'
 
@@ -9,4 +9,5 @@ urlpatterns = [
     path('invite/', invite, name='invite'),
     path('activate_team/<int:team_id>/', activate_team, name='activate_team'),
     path('<int:team_id>/', team, name='team'),
+    path('plans/', plans, name='plans'),
 ]

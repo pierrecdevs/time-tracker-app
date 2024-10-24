@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from apps.team.utilities import send_invitation, send_invitation_accepted
+from apps.team.utilities import send_invitation
 
 # Create your views here.
 from .models import Invitation, Team
@@ -100,3 +100,12 @@ def invite(request):
 
     return render(request, 'invite.html', { 'team':team })
 
+@login_required
+def plans(request):
+    team = get_object_or_404(Team, pk=request.user.userprofile.active_team_id, status=Team.ACTIVE)
+
+    context = {
+        'team': team,
+    }
+
+    return render(request, 'plans.html', context)
