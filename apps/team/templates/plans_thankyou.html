@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Thank you | {% endblock %}
+
+{% block content %}
+<nav class="breadcrumb" aira-label="breadcrumbs">
+  <ul>
+    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'myaccount' %}">My account</a></li>
+    <li><a href="{% url 'team:plans' %}">Plans</a></li>
+    <li class="active"><a href="{% url 'team:plans_thankyou' %}" aria-current="page">Thank you</a></li>
+</nav>
+
+<div class="columns is-multiline">
+  <div class="column is-12">
+    {% if error %}
+    <h1 class="title">Woops, something went wrong</h1>
+    Go back to <a href="{% url 'team:plans' %}">plans</a> and try again or <a href="#">contact us</a>
+    {% else %}
+    <h1 class="title">Thank you for purchasing a plan</h1>
+    Go back to <a href="{% url 'dashboard' %}">dashboard</a>
+
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

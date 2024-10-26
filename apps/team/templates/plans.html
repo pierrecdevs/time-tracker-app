@@ -124,8 +124,32 @@
     },
     delimiters: ['[[', ']]'],
     methods: {
-      subscribe(plan) {
+      async subscribe(plan) {
         console.log('Selected plan', plan);
+        const stripe = Stripe('{{ stripe_pub_key }}');
+        try {
+          const response = await fetch(`{% url 'team:create_checkout_session' %}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({
+              plan
+            })
+          });
+
+          if (response.ok) {
+            const json = await response.json();
+            console.log('JSON', json);
+            const { sessionId } = json;
+            console.log('Stripe Session', sessionId);
+
+            return stripe.redirectToCheckout({sessionId});
+          }
+        } catch (error) {
+          console.log('Error', error);
+        }
       },
     },
   };
