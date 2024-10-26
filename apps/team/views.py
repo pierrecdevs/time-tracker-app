@@ -1,13 +1,16 @@
+from datetime import datetime
 import string, secrets
+import stripe
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
+from django.conf import settings
 
 from apps.team.utilities import send_invitation
 
 # Create your views here.
-from .models import Invitation, Team
+from .models import Invitation, Plan, Team
 
 @login_required
 def team(request, team_id):
@@ -103,9 +106,51 @@ def invite(request):
 @login_required
 def plans(request):
     team = get_object_or_404(Team, pk=request.user.userprofile.active_team_id, status=Team.ACTIVE)
+    error = ''
+
+    if request.GET.get('cancel_plan', ''):
+        try:
+            plan_default = Plan.objects.get(is_default=True)
+
+            team.plan = plan_default
+            team.plan_status = Team.PLAN_CANCELED
+            team.save()
+
+            stripe.api_key = settings.STIPE_SECRET_KEY
+            stripe.Subscription.delete(team.stripe_subscription_id)
+        except Exception:
+            error = 'Something went wrong with the cancelation. Please try again'
 
     context = {
         'team': team,
+        'error': error,
+        'stripe_pub_key': settings.STRIPE_PUBLISHABLE_KEY,
     }
 
     return render(request, 'plans.html', context)
+
+@login_required
+def plans_thankyou(request):
+    error = ''
+
+    try:
+        team = get_object_or_404(Team, pk=request.user.userprofile.active_team_id, status=Team.ACTIVE)
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+        if not team.stripe_subscription_id:
+            raise ValueError('Stripe subscription ID is missing.')
+
+        print(f'Stripe Subscription ID: {team.stripe_subscription_id}')
+        subscription = stripe.Subscription.retrieve(team.stripe_subscription_id)
+        product = stripe.Product.retrieve(subscription.plan.product)
+
+        team.plan_status = Team.PLAN_ACTIVE
+        team.plan_end_date = datetime.fromtimestamp(subscription.current_period_end)
+        team.plan = Plan.objects.get(title=product.name)
+        team.save()
+    except Exception as e:
+        error = 'Something went wrong. Please try again!'
+        print(f"Error! {e}")
+
+    return render(request, 'plans_thankyou.html', {'error': error})
